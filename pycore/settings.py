@@ -1,25 +1,24 @@
 """Parameter and Argument handling.
 """
 
-import os
+# import os
 import argparse
 from datetime import datetime
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
-
 import tqdm
 
-import zcode.inout as zio
-# import zcode.math as zmath
+from . import utils
 
 
+@utils.Singleton
 class Settings:
 
     NAME = ""
-    DEBUG = False
+    VERBOSITY = 0     # 0: warning, 1: verbose, 2:debug
 
-    def __init__(self, path_output_type=None, **kwargs):
+    def __init__(self, **kwargs):
         """
         """
         time_beg = datetime.now()
@@ -65,7 +64,7 @@ class Settings:
 
         # Determine runtime environment
         # -------------------------------------
-        self._is_notebook = zio.environment_is_jupyter()
+        self._is_notebook = environment_is_jupyter()
 
         # Parse Command-Line Arugments
         # ---------------------------------------
@@ -145,6 +144,7 @@ class Settings:
 
         return
 
+    '''
     def _get_path_output(self, type):
         _valid_types = ['script', 'notebook']
         type = type.strip().lower()
@@ -202,9 +202,10 @@ class Settings:
             plt.close('all')
 
         return fname
+    '''
 
     def save_params(self, fname):
-        zio.check_path(fname)
+        # zio.check_path(fname)
         with open(fname, 'w') as out:
             rv = self._str_all()
             for line in rv:
@@ -214,6 +215,7 @@ class Settings:
         return
 
 
+@utils.Singleton
 class Constants:
 
     MPC3_PER_AS2 = 1.1641   # Redshift z = 2.0
@@ -231,6 +233,27 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
+def python_environment():
+    """Tries to determine the current python environment, one of: 'jupyter', 'ipython', 'terminal'.
+    """
+    try:
+        # NOTE: `get_ipython` should not be explicitly imported from anything
+        ipy_str = str(type(get_ipython())).lower()  # noqa
+        # print("ipy_str = '{}'".format(ipy_str))
+        if 'zmqshell' in ipy_str:
+            return 'jupyter'
+        if 'terminal' in ipy_str:
+            return 'ipython'
+    except:
+        return 'terminal'
+
+
+def environment_is_jupyter():
+    """Tries to determine whether the current python environment is a jupyter notebook.
+    """
+    return python_environment().lower().startswith('jupyter')
+
+
 if __name__ == "__main__":
-    args = Args()
-    print(args)
+    sets = Settings()
+    print(sets)
