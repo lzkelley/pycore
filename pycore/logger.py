@@ -1,12 +1,7 @@
 """Logging related classes and functions.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
-from datetime import datetime
 import logging
-import sys
-import os
-import shutil
 import inspect
 
 import numpy as np
@@ -32,9 +27,26 @@ class IndentFormatter(logging.Formatter):
         return out
 
 
-def get_logger(name, format_stream=None, format_file=None, format_date=None,
-               level_stream=logging.WARNING, level_file=logging.DEBUG,
-               tofile=None, tostr=True):
+def get_logger(sets):
+    """Load logger instance: convert from `sets` settings to standard log parameters
+    """
+
+    if sets.VERBOSITY == 0:
+        stream_level = logging.WARNING
+    elif sets.VERBOSITY == 1:
+        stream_level = logging.INFO
+    elif sets.VERBOSITY == 2:
+        stream_level = logging.DEBUG
+    else:
+        raise ValueError("Unexpected `verbosity` value: '{}'".format(sets.VERBOSITY))
+
+    log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG)
+    return log
+
+
+def load_logger(name, format_stream=None, format_file=None, format_date=None,
+                level_stream=logging.WARNING, level_file=logging.DEBUG,
+                tofile=None, tostr=True):
     """Create a standard logger object which logs to file and or stdout stream.
     """
     if (tofile is None) and (not tostr):
@@ -112,6 +124,7 @@ def get_logger(name, format_stream=None, format_file=None, format_date=None,
 
     logger.raise_error = _raise_error.__get__(logger)
 
+    '''
     # Add a `after` method to log how long something took
     # ---------------------------------------------------
     logger._after_lvl = logging.INFO
@@ -139,7 +152,9 @@ def get_logger(name, format_stream=None, format_file=None, format_date=None,
         self.log(lvl, _str)
     # Not entirely sure why this works, but it seems to
     logger.after = _after.__get__(logger)
+    '''
 
+    '''
     # Add a `copy_file` method to copy logfile to the given destination
     # -----------------------------------------------------------------
     def _copy(self, dest, modify_exists=False):
@@ -151,9 +166,9 @@ def get_logger(name, format_stream=None, format_file=None, format_date=None,
         shutil.copy(self.filename, dest)
     # Not entirely sure why this works, but it seems to
     logger.copy = _copy.__get__(logger)
+    '''
 
-    # Add a `raise_error` method to both log an error and raise one
-    # -------------------------------------------------------------
+    '''
     logger._frac_lvl = logging.INFO
 
     def _frac(self, num, den, prep=None, post=None, lvl=None):
@@ -173,13 +188,12 @@ def get_logger(name, format_stream=None, format_file=None, format_date=None,
     logger.frac = _frac.__get__(logger)
 
     def _clear_files(self):
-        """Log information about a fraction, "[{prep} ]{}/{} = {}[ {post}]".
-        """
         for fn in self._filenames:
             with open(fn, 'w') as out:  # noqa
                 pass
 
     logger.clear_files = _clear_files.__get__(logger)
+    '''
 
     for lvl in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
         setattr(logger, lvl, getattr(logging, lvl))

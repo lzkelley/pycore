@@ -4,17 +4,54 @@ Can be run with:
     $ nosetests <PATH>
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+# from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
-import warnings
-import shutil
+# import os
+# import warnings
+# import shutil
 
-from numpy.testing import run_module_suite
-import numpy as np
-from nose.tools import assert_true, assert_false, assert_equal
+# from numpy.testing import run_module_suite
+# import numpy as np
+from nose.tools import assert_true
 
 
+def test_basic():
+    import pycore
+
+    class Settings(pycore.Settings):
+        NUM = 1
+        LET = "z"
+        NAME = __file__
+
+    class Core(pycore.Core):
+        SOME = "thing"
+        _CLASS_SETTINGS = Settings
+
+    core = Core()
+    print(core)
+
+    core.log.warning("logging test")
+    print("some", core.SOME)
+    assert_true(core.SOME == "thing")
+    print("sets.NUM", core.sets.NUM)
+    assert_true(core.sets.NUM == 1)
+    assert_true(core.sets.LET == "z")
+    assert_true(core.sets.NAME == __file__)
+
+    # Make sure `Settings` is a singleton
+    other_sets = Settings()
+    print(core.sets, other_sets)
+    assert_true(core.sets is other_sets)
+
+    # Make sure `Core` is a singleton
+    other_core = Core()
+    print(core, other_core)
+    assert_true(core is other_core)
+
+    return
+
+
+'''
 class TestInoutCore(object):
 
     @classmethod
@@ -145,7 +182,7 @@ class TestInoutCore(object):
         if os.path.exists(fdir) and os.path.isdir(fdir):
             shutil.rmtree(fdir)
 
-        '''
+        """
         # Create files that should *not* interfere with 'modify_exists'
         #    'modify_exists' should only look for 2-digit appended numbers
         fname_distract_1 = modify_filename(fname, append='_6')
@@ -153,7 +190,7 @@ class TestInoutCore(object):
         print("Interference filenames = '{}', '{}'".format(fname_distract_1, fname_distract_2))
         for ff in [fname_distract_1, fname_distract_2]:
             open(ff, 'a')
-        '''
+        """
 
         # Test that filenames are appropriately modified
         # ----------------------------------------------
@@ -178,3 +215,4 @@ class TestInoutCore(object):
 # Run all methods as if with `nosetests ...`
 if __name__ == "__main__":
     run_module_suite()
+'''

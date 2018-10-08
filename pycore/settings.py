@@ -1,24 +1,24 @@
 """Parameter and Argument handling.
 """
 
-# import os
 import argparse
 from datetime import datetime
 
-# import matplotlib.pyplot as plt
 import numpy as np
 import tqdm
 
 from . import utils
 
 
-@utils.Singleton
-class Settings:
+# @utils.Singleton
+# class Settings:
+class Settings(utils.Singleton):
 
     NAME = ""
     VERBOSITY = 0     # 0: warning, 1: verbose, 2:debug
+    LOG = None        # To log to file, provide filename
 
-    def __init__(self, **kwargs):
+    def __init__(self, parse_cl=False, **kwargs):
         """
         """
         time_beg = datetime.now()
@@ -56,6 +56,8 @@ class Settings:
 
             name_max_len = len(name) if len(name) > name_max_len else name_max_len
 
+        self.add_arguments(parser)
+
         self._parser = parser
         self._var_names = var_names
         self._var_types = var_types
@@ -68,9 +70,13 @@ class Settings:
 
         # Parse Command-Line Arugments
         # ---------------------------------------
+        '''
         if self._is_notebook:
             print("Running from jupyter notebook.  Skipping `parse_args()`")
         else:
+            self.parse_args()
+        '''
+        if parse_cl:
             self.parse_args()
 
         # Set progress-bar type based on environment
@@ -78,6 +84,9 @@ class Settings:
         self.tqdm_method = tqdm_method
 
         return
+
+    def add_arguments(self, parser):
+        pass
 
     def _get_internal_var_names(self):
         """Find internal variable names which can be set/modified.
