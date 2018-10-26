@@ -12,7 +12,8 @@ class Paths(utils.Singleton):
 
     # MODULE = PATH_MODULE
 
-    def __init__(self, **kwargs):
+    def __init__(self, core, **kwargs):
+        self._core = core
         self._node_name = os.uname().nodename
 
         '''

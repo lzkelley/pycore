@@ -21,15 +21,15 @@ class Core(utils.Singleton):
     _CLASS_SETTINGS = settings.Settings
     _CLASS_PATHS = paths.Paths
 
-    def __init__(self):
+    def __init__(self, parse_cl=True, **kwargs):
         # self.sets = settings.Settings.Instance()
         # self.paths = paths.Paths.Instance()
 
         # self.sets = self._CLASS_SETTINGS.Instance()
         # self.paths = self._CLASS_PATHS.Instance()
 
-        self.sets = self._CLASS_SETTINGS()
-        self.paths = self._CLASS_PATHS()
+        self.sets = self._CLASS_SETTINGS(parse_cl=parse_cl, **kwargs)
+        self.paths = self._CLASS_PATHS(self)
         self.log = logger.get_logger(self.sets)
 
         self.log.debug("Core.__init__()")
