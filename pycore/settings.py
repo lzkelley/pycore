@@ -65,6 +65,7 @@ class Settings(utils.Singleton):
         # Determine runtime environment
         # -------------------------------------
         self._pyenv = python_environment()
+        print("env = ", self._pyenv)
         self._is_notebook = environment_is_jupyter()
 
         # Parse Command-Line Arugments
