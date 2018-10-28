@@ -65,17 +65,10 @@ class Settings(utils.Singleton):
         # Determine runtime environment
         # -------------------------------------
         self._pyenv = python_environment()
-        print("env = ", self._pyenv)
         self._is_notebook = environment_is_jupyter()
 
         # Parse Command-Line Arugments
         # ---------------------------------------
-        '''
-        if self._is_notebook:
-            print("Running from jupyter notebook.  Skipping `parse_args()`")
-        else:
-            self.parse_args()
-        '''
         if parse_cl is None:
             parse_cl = (self._pyenv == 'terminal')
 

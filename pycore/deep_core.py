@@ -21,7 +21,7 @@ class Core(utils.Singleton):
     _CLASS_SETTINGS = settings.Settings
     _CLASS_PATHS = paths.Paths
 
-    def __init__(self, parse_cl=True, **kwargs):
+    def __init__(self, parse_cl=None, **kwargs):
         # self.sets = settings.Settings.Instance()
         # self.paths = paths.Paths.Instance()
 
