@@ -15,21 +15,24 @@ def warn_with_traceback(message, category, filename, lineno, file=None, line=Non
     return
 
 
-# @utils.Singleton
 class Core(utils.Singleton):
 
     _CLASS_SETTINGS = settings.Settings
     _CLASS_PATHS = paths.Paths
 
-    def __init__(self, parse_cl=None, **kwargs):
-        # self.sets = settings.Settings.Instance()
-        # self.paths = paths.Paths.Instance()
+    def __init__(self, sets={}, paths={}, log={}):
 
-        # self.sets = self._CLASS_SETTINGS.Instance()
-        # self.paths = self._CLASS_PATHS.Instance()
+        if not isinstance(sets, self._CLASS_SETTINGS):
+            sets = self._CLASS_SETTINGS(**sets)
 
-        self.sets = self._CLASS_SETTINGS(parse_cl=parse_cl, **kwargs)
-        self.paths = self._CLASS_PATHS(self)
+        self.sets = sets
+
+        # `self.sets` must be set before initializing paths
+        if not isinstance(paths, self._CLASS_PATHS):
+            paths = self._CLASS_PATHS(self)
+
+        self.paths = paths
+
         self.log = logger.get_logger(self.sets)
 
         self.log.debug("Core.__init__()")
