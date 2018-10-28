@@ -16,7 +16,7 @@ class Settings(utils.Singleton):
     VERBOSITY = 0     # 0: warning, 1: verbose, 2:debug
     LOG_FILENAME = None        # To log to file, provide filename
 
-    def __init__(self, parse_cl=False, **kwargs):
+    def __init__(self, parse_cl=None, **kwargs):
         """
         """
         time_beg = datetime.now()
@@ -64,6 +64,7 @@ class Settings(utils.Singleton):
 
         # Determine runtime environment
         # -------------------------------------
+        self._pyenv = python_environment()
         self._is_notebook = environment_is_jupyter()
 
         # Parse Command-Line Arugments
@@ -74,6 +75,9 @@ class Settings(utils.Singleton):
         else:
             self.parse_args()
         '''
+        if parse_cl is None:
+            parse_cl = (self._pyenv == 'terminal')
+
         if parse_cl:
             self.parse_args()
 
