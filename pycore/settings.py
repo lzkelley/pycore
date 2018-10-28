@@ -13,7 +13,7 @@ from . import utils
 class Settings(utils.Singleton):
 
     NAME = ""
-    VERBOSITY = 0     # 0: warning, 1: verbose, 2:debug
+    VERBOSITY = 20     # 30: warning, 20: info, 10:debug
     LOG_FILENAME = None        # To log to file, provide filename
 
     def __init__(self, parse_cl=None, **kwargs):

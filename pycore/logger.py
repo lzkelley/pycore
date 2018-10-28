@@ -31,6 +31,7 @@ def get_logger(sets):
     """Load logger instance: convert from `sets` settings to standard log parameters
     """
 
+    '''
     if sets.VERBOSITY == 0:
         stream_level = logging.WARNING
     elif sets.VERBOSITY == 1:
@@ -41,6 +42,10 @@ def get_logger(sets):
         raise ValueError("Unexpected `verbosity` value: '{}'".format(sets.VERBOSITY))
 
     log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG_FILENAME)
+    '''
+
+    log = load_logger(sets.NAME, level_stream=sets.VERBOSITY, tofile=sets.LOG_FILENAME)
+
     return log
 
 
