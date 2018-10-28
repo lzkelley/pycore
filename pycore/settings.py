@@ -10,13 +10,11 @@ import tqdm
 from . import utils
 
 
-# @utils.Singleton
-# class Settings:
 class Settings(utils.Singleton):
 
     NAME = ""
     VERBOSITY = 0     # 0: warning, 1: verbose, 2:debug
-    LOG = None        # To log to file, provide filename
+    LOG_FILENAME = None        # To log to file, provide filename
 
     def __init__(self, parse_cl=False, **kwargs):
         """

@@ -40,7 +40,7 @@ def get_logger(sets):
     else:
         raise ValueError("Unexpected `verbosity` value: '{}'".format(sets.VERBOSITY))
 
-    log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG)
+    log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG_FILENAME)
     return log
 
 
