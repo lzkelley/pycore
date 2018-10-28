@@ -79,7 +79,7 @@ class Settings(utils.Singleton):
 
         # Set progress-bar type based on environment
         tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
-        self.tqdm_method = tqdm_method
+        self.tqdm = tqdm_method
 
         return
 
