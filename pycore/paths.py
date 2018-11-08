@@ -96,19 +96,37 @@ class Paths(utils.Singleton):
 
         return path
 
-    def save_fig(self, fig, name, subdir=None, fignum=True, verbose=True, close=False):
+    def save_fig(self, fig, name, subdir=None, fignum=None, verbose=True, close=None):
         if (not name.endswith('.pdf')) and (not name.endswith('.png')):
             name += '.pdf'
 
+        if close is None:
+            if self._core.sets._is_notebook:
+                close = True
+            elif self._core.sets._is_ipython:
+                close = True
+            else:
+                close = False
+
+        modify_exists = False
+        path = self.output_plots
         if subdir is not None:
-            fname = os.path.join(self.output_plots, subdir, name)
-            self.check_path(fname)
+            path = os.path.join(path, subdir)
+            modify_exists = True
+
+        fname = os.path.join(path, name)
+        self.check_path(fname)
+        if modify_exists:
             fname = zio.modify_exists(fname)
-            fig.savefig(fname)
-            if verbose:
-                print("Saved to '{}'".format(fname))
+
+        fig.savefig(fname)
+        # if verbose:                                                                                 
+        #    print("Saved to '{}'".format(fname))
+        self._core.log.info("Saved to '{}'".format(fname))
 
         if fignum is not None:
+            raise NotImplementedError("`fignum` support has not been implemented!")
+
             if isinstance(fignum, str):
                 name = zio.modify_filename(name, prepend=fignum + "_")
             fname = os.path.join(self.path_output_figs, name)
@@ -117,8 +135,9 @@ class Paths(utils.Singleton):
             if verbose:
                 print("Saved to '{}'".format(fname))
 
-        # if close:
-        #     plt.close('all')
+        if close:
+            import matplotlib.pyplot as plt
+            plt.close('all')
 
         return fname
 
@@ -127,6 +146,7 @@ class Paths(utils.Singleton):
         path = self.check_path(self.OUTPUT)
         return path
 
+    @property
     def output_plots(self):
         path = os.path.join(self.output, self._DNAME_PLOTS, "")
         path = self.check_path(path)
