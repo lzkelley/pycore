@@ -66,6 +66,7 @@ class Settings(utils.Singleton):
         # -------------------------------------
         self._pyenv = python_environment()
         self._is_notebook = environment_is_jupyter()
+        self._is_ipython = environment_is_ipython()
 
         # Parse Command-Line Arugments
         # ---------------------------------------
@@ -257,6 +258,9 @@ def environment_is_jupyter():
     """Tries to determine whether the current python environment is a jupyter notebook.
     """
     return python_environment().lower().startswith('jupyter')
+
+def environment_is_ipython():
+    return python_environment().lower().startswith('ipython')
 
 
 if __name__ == "__main__":
