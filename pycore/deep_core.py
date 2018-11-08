@@ -5,6 +5,8 @@ import traceback
 import warnings
 import sys
 
+import cosmopy
+
 from . import utils, paths, logger, settings
 
 
@@ -35,8 +37,9 @@ class Core(utils.Singleton):
 
         self.log = logger.get_logger(self.sets)
 
-        self.log.debug("Core.__init__()")
-        self.log.info("Initializing Core instance")
+        self.log.debug("Core initializing... loaded: `sets`, `paths`, `log`")
+        self.cosmo = cosmopy.get_cosmology()
+        self.log.debug("Loaded `cosmo`")
 
         '''
         if ERROR_WARNINGS:
