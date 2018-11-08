@@ -61,6 +61,14 @@ class Core(utils.Singleton):
 
         self.__root = (rank == 0)
         '''
+
+        import sys
+
+        def _excepthook(exctype, exc, tb):
+            self.log.exception("An unhandled exception occurred.", exc_info=(exctype, exc, tb))
+
+        sys.excepthook = _excepthook
+                                                                                                    
         return
 
     '''
