@@ -25,7 +25,7 @@ class IndentFormatter(logging.Formatter):
             rec.msg = repr(super().formatException(rec.exc_info))
             rec.exc_info = None
             return super().format(rec)
-            
+
         stack = inspect.stack()
         if (self.baseline is None) or (len(stack) < self.baseline):
             self.baseline = len(stack)
