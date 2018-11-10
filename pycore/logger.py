@@ -95,11 +95,12 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
             format_file = "%(asctime)s %(levelname)8.8s [%(filename)20.20s:"
             format_file += "%(funcName)-20.20s:%(lineno)d]%(indent)s%(message)s"
 
-        # fileFormatter = IndentFormatter(format_file, format_date=format_date)
-        fileHandler = logging.FileHandler(tofile, 'w')
-        # fileHandler.setFormatter(fileFormatter)
-        fileHandler.setLevel(level_file)
-        logger.addHandler(fileHandler)
+        # file_formatter = IndentFormatter(format_file, format_date=format_date)
+        file_formatter = logging.Formatter(format_file, format_date)
+        file_handler = logging.fileHandler(tofile, 'w')
+        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(level_file)
+        logger.addHandler(file_handler)
         #     Store output filename to `logger` object
         logger.filename = tofile
         logger._filenames.append(tofile)
@@ -109,7 +110,7 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
             level_info = logging.INFO
             tofile_info = inout_core.modify_filename(tofile, append='_info')
             file_form = IndentFormatter(format_file, format_date=format_date)
-            file_hand = logging.FileHandler(tofile_info, 'w')
+            file_hand = logging.fileHandler(tofile_info, 'w')
             file_hand.setFormatter(file_form)
             file_hand.setLevel(level_info)
             logger.addHandler(file_hand)
