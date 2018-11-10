@@ -94,7 +94,7 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
         if format_file is None:
             format_file = "%(asctime)s %(levelname)8.8s [%(filename)20.20s:"
             # format_file += "%(funcName)-20.20s:%(lineno)d]%(indent)s%(message)s"
-            format_file += "%(funcName)-20.20s:%(lineno)d] %(message)s"
+            format_file += "%(funcName)-20.20s:%(lineno)4d] %(message)s"
 
         # file_formatter = IndentFormatter(format_file, format_date=format_date)
         file_formatter = logging.Formatter(format_file, format_date)
