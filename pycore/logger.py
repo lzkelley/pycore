@@ -141,6 +141,14 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
 
     logger.raise_error = _raise_error.__get__(logger)
 
+    # Excepthook
+    '''
+    def _excepthook(self, exctype, exc, tb):
+        self.log.exception("An unhandled exception occurred.", exc_info=(exctype, exc, tb))
+
+    logger.excepthook = _excepthook.__get__(logger)
+    '''
+
     '''
     # Add a `after` method to log how long something took
     # ---------------------------------------------------
