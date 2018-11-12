@@ -96,14 +96,14 @@ class Paths(utils.Singleton):
 
         return path
 
-    def save_fig(self, fig, name, subdir=None, fignum=None, verbose=True, close=None):
+    def save_fig(self, fig, name, subdir=None, fignum=None, verbose=True, close=None, log_lvl=30):
         if (not name.endswith('.pdf')) and (not name.endswith('.png')):
             name += '.pdf'
 
         if close is None:
-            if self._core.sets._is_notebook:
-                close = True
-            elif self._core.sets._is_ipython:
+            if self._core._is_notebook:
+                close = False
+            elif self._core._is_ipython:
                 close = True
             else:
                 close = False
@@ -120,9 +120,9 @@ class Paths(utils.Singleton):
             fname = zio.modify_exists(fname)
 
         fig.savefig(fname)
-        # if verbose:                                                                                 
+        # if verbose:
         #    print("Saved to '{}'".format(fname))
-        self._core.log.info("Saved to '{}'".format(fname))
+        self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
         if fignum is not None:
             raise NotImplementedError("`fignum` support has not been implemented!")
@@ -133,7 +133,7 @@ class Paths(utils.Singleton):
             zio.check_path(fname)
             fig.savefig(fname)
             if verbose:
-                print("Saved to '{}'".format(fname))
+                self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
         if close:
             import matplotlib.pyplot as plt
