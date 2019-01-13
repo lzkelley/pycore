@@ -16,6 +16,16 @@ class IndentFormatter(logging.Formatter):
         self.baseline = None
 
     def format(self, rec):
+        if rec.exc_info:
+            rec.indent = ""
+            return super().format(rec)
+            # Replace record.msg with the string representation of the message
+            # use repr() to prevent printing it to multiple lines
+            rec.indent = ""
+            rec.msg = repr(super().formatException(rec.exc_info))
+            rec.exc_info = None
+            return super().format(rec)
+
         stack = inspect.stack()
         if (self.baseline is None) or (len(stack) < self.baseline):
             self.baseline = len(stack)
@@ -83,13 +93,15 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
     if tofile is not None:
         if format_file is None:
             format_file = "%(asctime)s %(levelname)8.8s [%(filename)20.20s:"
-            format_file += "%(funcName)-20.20s]%(indent)s%(message)s"
+            # format_file += "%(funcName)-20.20s:%(lineno)d]%(indent)s%(message)s"
+            format_file += "%(funcName)-20.20s:%(lineno)4d] %(message)s"
 
-        fileFormatter = IndentFormatter(format_file, format_date=format_date)
-        fileHandler = logging.FileHandler(tofile, 'w')
-        fileHandler.setFormatter(fileFormatter)
-        fileHandler.setLevel(level_file)
-        logger.addHandler(fileHandler)
+        # file_formatter = IndentFormatter(format_file, format_date=format_date)
+        file_formatter = logging.Formatter(format_file, format_date)
+        file_handler = logging.FileHandler(tofile, 'w')
+        file_handler.setFormatter(file_formatter)
+        file_handler.setLevel(level_file)
+        logger.addHandler(file_handler)
         #     Store output filename to `logger` object
         logger.filename = tofile
         logger._filenames.append(tofile)
@@ -128,6 +140,14 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
         raise error(msg)
 
     logger.raise_error = _raise_error.__get__(logger)
+
+    # Excepthook
+    '''
+    def _excepthook(self, exctype, exc, tb):
+        self.log.exception("An unhandled exception occurred.", exc_info=(exctype, exc, tb))
+
+    logger.excepthook = _excepthook.__get__(logger)
+    '''
 
     '''
     # Add a `after` method to log how long something took

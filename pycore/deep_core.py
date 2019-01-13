@@ -5,6 +5,10 @@ import traceback
 import warnings
 import sys
 
+import tqdm
+
+import cosmopy
+
 from . import utils, paths, logger, settings
 
 
@@ -33,10 +37,13 @@ class Core(utils.Singleton):
 
         self.paths = paths
 
-        self.log = logger.get_logger(self.sets)
+        # TODO: `log` argument is not being used!
+        log = logger.get_logger(self.sets)
+        self.log = log
 
-        self.log.debug("Core.__init__()")
-        self.log.info("Initializing Core instance")
+        self.log.debug("Core initializing... loaded: `sets`, `paths`, `log`")
+        self.cosmo = cosmopy.get_cosmology()
+        self.log.debug("Loaded `cosmo`")
 
         '''
         if ERROR_WARNINGS:
@@ -52,16 +59,72 @@ class Core(utils.Singleton):
         self.log.debug("Adding traceback to warnings")
         warnings.showwarning = warn_with_traceback
 
-        '''
+        # Setup Environment related parameters depdending on run-type
+        # --------------------------------------------------------------------
+        self._setup_py_env()
+
         try:
-            comm = MPI.COMM_WORLD
+            comm = MPI.COMM_WORLD  # noqa
             rank = comm.rank
+            parallel = True
         except:
             rank = 0
+            parallel = False
 
-        self.__root = (rank == 0)
-        '''
+        self._mpi_rank = rank
+        self._mpi_is_root = (rank == 0)
+        self._mpi_parallel = parallel
+
+        import sys
+
+        def _excepthook(exctype, exc, tb):
+            self.log.exception("An unhandled exception occurred.", exc_info=(exctype, exc, tb))
+
+        sys.excepthook = _excepthook
+
         return
+
+    def _setup_py_env(self):
+        log = self.log
+        pyenv = self.sets._pyenv
+        notebook = False
+        ipython = False
+        script = False
+
+        if pyenv.startswith('notebook'):
+            notebook = True
+            setup_func = self.setup_for_notebook
+        elif pyenv.startswith('ipython'):
+            ipython = True
+            setup_func = self.setup_for_ipython
+        elif pyenv.startswith('script'):
+            script = True
+            setup_func = self.setup_for_script
+        else:
+            self.log.warning("Unrecognized environment: '{}'".format(pyenv))
+
+        self._is_notebook = notebook
+        self._is_ipython = ipython
+        self._is_script = script
+
+        log.debug("Environment: '{}' detected, running setup".format(pyenv))
+        setup_func()
+
+        # Set progress-bar type based on environment
+        #    `_is_notebook` is set in `_setup_py_env()`
+        tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
+        self.tqdm = tqdm_method
+
+        return
+
+    def setup_for_notebook(self):
+        pass
+
+    def setup_for_ipython(self):
+        pass
+
+    def setup_for_script(self):
+        pass
 
     '''
     def save_fig(self, fig, fname, modify_exists=True, save_kwargs={},

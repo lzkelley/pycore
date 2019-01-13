@@ -5,7 +5,6 @@ import argparse
 from datetime import datetime
 
 import numpy as np
-import tqdm
 
 from . import utils
 
@@ -64,20 +63,16 @@ class Settings(utils.Singleton):
 
         # Determine runtime environment
         # -------------------------------------
-        self._pyenv = python_environment()
-        self._is_notebook = environment_is_jupyter()
+        self._pyenv = utils.python_environment().lower().strip()
+        _is_script = self._pyenv.startswith('script')
 
         # Parse Command-Line Arugments
         # ---------------------------------------
         if parse_cl is None:
-            parse_cl = (self._pyenv == 'terminal')
+            parse_cl = _is_script
 
         if parse_cl:
             self.parse_args()
-
-        # Set progress-bar type based on environment
-        tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
-        self.tqdm = tqdm_method
 
         return
 
@@ -181,32 +176,6 @@ class Settings(utils.Singleton):
         zio.check_path(path_output)
         path_output_figs = os.path.join(path_output, FIGS_OUTPUT_FNAME, "")
         return path_output, path_output_figs
-
-    def save_fig(self, fig, name, subdir=None, fignum=True, verbose=True, close=False):
-        if (not name.endswith('.pdf')) and (not name.endswith('.png')):
-            name += '.pdf'
-
-        if subdir is not None:
-            fname = os.path.join(self.path_output, subdir, name)
-            zio.check_path(fname)
-            fname = zio.modify_exists(fname)
-            fig.savefig(fname)
-            if verbose:
-                print("Saved to '{}'".format(fname))
-
-        if fignum is not None:
-            if isinstance(fignum, str):
-                name = zio.modify_filename(name, prepend=fignum + "_")
-            fname = os.path.join(self.path_output_figs, name)
-            zio.check_path(fname)
-            fig.savefig(fname)
-            if verbose:
-                print("Saved to '{}'".format(fname))
-
-        if close:
-            plt.close('all')
-
-        return fname
     '''
 
     def save_params(self, fname):
@@ -236,27 +205,6 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-
-
-def python_environment():
-    """Tries to determine the current python environment, one of: 'jupyter', 'ipython', 'terminal'.
-    """
-    try:
-        # NOTE: `get_ipython` should not be explicitly imported from anything
-        ipy_str = str(type(get_ipython())).lower()  # noqa
-        # print("ipy_str = '{}'".format(ipy_str))
-        if 'zmqshell' in ipy_str:
-            return 'jupyter'
-        if 'terminal' in ipy_str:
-            return 'ipython'
-    except:
-        return 'terminal'
-
-
-def environment_is_jupyter():
-    """Tries to determine whether the current python environment is a jupyter notebook.
-    """
-    return python_environment().lower().startswith('jupyter')
 
 
 if __name__ == "__main__":
