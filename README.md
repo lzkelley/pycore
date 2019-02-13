@@ -8,9 +8,6 @@ Core structures for simulations and analysis in python
 
     ```python
     import os
-    import glob
-
-    import numpy as np
 
     import pycore
 
