@@ -38,7 +38,7 @@ class Core(utils.Singleton):
         self.paths = paths
 
         # TODO: `log` argument is not being used!
-        log = logger.get_logger(self.sets)
+        log = logger.get_logger(self)
         self.log = log
 
         self.log.debug("Core initializing... loaded: `sets`, `paths`, `log`")
@@ -84,6 +84,16 @@ class Core(utils.Singleton):
 
         return
 
+    @classmethod
+    def load(self, core=None):
+        if core is None:
+            core = Core()
+
+        if not isinstance(core, Core):
+            raise ValueError("`core` type: {} is invalid!".format(type(core)))
+
+        return core
+
     def _setup_py_env(self):
         log = self.log
         pyenv = self.sets._pyenv
@@ -121,7 +131,9 @@ class Core(utils.Singleton):
         pass
 
     def setup_for_ipython(self):
-        pass
+        import matplotlib as mpl
+        mpl.use('Agg')
+        return
 
     def setup_for_script(self):
         pass
