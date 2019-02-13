@@ -1,6 +1,7 @@
 """Logging related classes and functions.
 """
 
+import os
 import logging
 import inspect
 
@@ -37,7 +38,7 @@ class IndentFormatter(logging.Formatter):
         return out
 
 
-def get_logger(sets):
+def get_logger(core):
     """Load logger instance: convert from `sets` settings to standard log parameters
     """
 
@@ -53,8 +54,10 @@ def get_logger(sets):
 
     log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG_FILENAME)
     '''
-
-    log = load_logger(sets.NAME, level_stream=sets.VERBOSITY, tofile=sets.LOG_FILENAME)
+    sets = core.sets
+    paths = core.paths
+    fname = os.path.join(paths.output_logs, sets.LOG_FILENAME)
+    log = load_logger(sets.NAME, level_stream=sets.VERBOSITY, tofile=fname)
 
     return log
 
