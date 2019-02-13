@@ -13,7 +13,10 @@ from . import utils
 class Paths(utils.Singleton):
 
     # MODULE = PATH_MODULE
-    _DNAME_PLOTS = "plots"
+    # _DNAME_PLOTS = "figs"
+
+    # Paths to create if they do not already exist
+    _CHECK_PATHS = []
 
     def __init__(self, core, **kwargs):
         self._core = core
@@ -50,6 +53,10 @@ class Paths(utils.Singleton):
         # Construct a list of required files
         req_files = []
         # req_files.append(self.MERGED_GAIA_FNAME)
+
+        # Make sure required directories exist
+        for path in self._CHECK_PATHS:
+            zio.check_path(path)
 
         self._req_files = req_files
         # Make sure required files exist
@@ -96,7 +103,7 @@ class Paths(utils.Singleton):
 
         return path
 
-    def save_fig(self, fig, name, subdir=None, fignum=None, verbose=True, close=None, log_lvl=30):
+    def save_fig(self, fig, name, subdir=None, fignum=None, close=None, log_lvl=30):
         if (not name.endswith('.pdf')) and (not name.endswith('.png')):
             name += '.pdf'
 
@@ -109,7 +116,7 @@ class Paths(utils.Singleton):
                 close = False
 
         modify_exists = False
-        path = self.output_plots
+        path = self.output_figs
         if subdir is not None:
             path = os.path.join(path, subdir)
             modify_exists = True
@@ -120,8 +127,6 @@ class Paths(utils.Singleton):
             fname = zio.modify_exists(fname)
 
         fig.savefig(fname)
-        # if verbose:
-        #    print("Saved to '{}'".format(fname))
         self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
         if fignum is not None:
@@ -132,8 +137,8 @@ class Paths(utils.Singleton):
             fname = os.path.join(self.path_output_figs, name)
             zio.check_path(fname)
             fig.savefig(fname)
-            if verbose:
-                self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
+            # if verbose:
+            self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
         if close:
             import matplotlib.pyplot as plt
@@ -147,23 +152,15 @@ class Paths(utils.Singleton):
         return path
 
     @property
-    def output_plots(self):
-        path = os.path.join(self.output, self._DNAME_PLOTS, "")
-        path = self.check_path(path)
-        return path
-
-    '''
-    @property
-    def OUTPUT(self):
-        path = self.__OUTPUT_PATH
-        return path
+    def output_figs(self):
+        # path = os.path.join(self.output, self._DNAME_PLOTS, "")
+        # path = self.check_path(path)
+        # return path
+        return self.output
 
     @property
-    def OUTPUT_PLOTS(self):
-        path = os.path.join(self.OUTPUT, DNAME_OUTPUT_PLOTS, '')
-        zio.check_path(path)
-        return path
-    '''
+    def output_logs(self):
+        return self.output
 
 
 def modify_filename(fname, prepend='', append=''):
