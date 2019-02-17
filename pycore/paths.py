@@ -17,6 +17,8 @@ class Paths(utils.Singleton):
 
     # Paths to create if they do not already exist
     _CHECK_PATHS = []
+    _CWD = os.path.realpath(os.getcwd())
+
 
     def __init__(self, core, **kwargs):
         self._core = core
@@ -160,7 +162,8 @@ class Paths(utils.Singleton):
 
     @property
     def output_logs(self):
-        return self.output
+        # return self.output
+        return self._CWD
 
 
 def modify_filename(fname, prepend='', append=''):
