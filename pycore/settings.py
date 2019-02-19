@@ -1,6 +1,7 @@
 """Parameter and Argument handling.
 """
 
+# import sys
 import argparse
 from datetime import datetime
 
@@ -18,7 +19,7 @@ class Settings(utils.Singleton):
     def __init__(self, parse_cl=None, **kwargs):
         """
         """
-        time_beg = datetime.now()
+        # time_beg = datetime.now()
 
         name_max_len = 40
         for name, value in kwargs.items():
@@ -59,7 +60,7 @@ class Settings(utils.Singleton):
         self._var_names = var_names
         self._var_types = var_types
         self._name_max_len = name_max_len
-        self.time_beg = time_beg
+        # self.time_beg = time_beg
 
         # Determine runtime environment
         # -------------------------------------
@@ -72,6 +73,8 @@ class Settings(utils.Singleton):
             parse_cl = _is_script
 
         if parse_cl:
+            # print("pycore.settings.py:parse_args()")
+            # print("pycore.settings.py:sys.argv = ", sys.argv)
             self.parse_args()
 
         return
@@ -128,12 +131,6 @@ class Settings(utils.Singleton):
                 if new_value != old_value:
                     changed = True
             except ValueError as err:
-                # print("name = '{}'".formart(name))
-                # print("old = ", old_value)
-                # print("new = ", new_value)
-                # print(err)
-                # print("\n")
-                # raise
                 if not np.all(new_value == old_value):
                     changed = True
 
