@@ -2,6 +2,7 @@
 """
 
 import os
+# from datetime import datetime
 import logging
 import inspect
 
@@ -41,23 +42,26 @@ class IndentFormatter(logging.Formatter):
 def get_logger(core):
     """Load logger instance: convert from `sets` settings to standard log parameters
     """
-
-    '''
-    if sets.VERBOSITY == 0:
-        stream_level = logging.WARNING
-    elif sets.VERBOSITY == 1:
-        stream_level = logging.INFO
-    elif sets.VERBOSITY == 2:
-        stream_level = logging.DEBUG
-    else:
-        raise ValueError("Unexpected `verbosity` value: '{}'".format(sets.VERBOSITY))
-
-    log = load_logger(sets.NAME, level_stream=stream_level, tofile=sets.LOG_FILENAME)
-    '''
     sets = core.sets
     paths = core.paths
-    fname = os.path.join(paths.output_logs, sets.LOG_FILENAME)
-    log = load_logger(sets.NAME, level_stream=sets.VERBOSITY, tofile=fname)
+    fname = sets.LOG_FILENAME
+
+    comps = fname.split('.')
+    if len(comps) == 1:
+        fname_base = fname
+        fname_suff = ".log"
+    else:
+        fname_base = comps[:-1]
+        fname_suff = comps[-1]
+
+    rank = core._mpi_rank
+    tostr = (rank == 0)
+    if rank > 0:
+        fname_suff = "_rank{:04d}".format(rank) + fname_suff
+
+    fname = fname_base + fname_suff
+    fname = os.path.join(paths.output_logs, fname)
+    log = load_logger(sets.NAME, level_stream=sets.VERBOSITY, tofile=fname, tostr=tostr)
 
     return log
 
