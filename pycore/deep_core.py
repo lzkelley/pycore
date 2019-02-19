@@ -2,6 +2,7 @@
 """
 
 import traceback
+from datetime import datetime
 import warnings
 import sys
 
@@ -25,6 +26,9 @@ class Core(utils.Singleton):
     _CLASS_PATHS = paths.Paths
 
     def __init__(self, sets={}, paths={}, log={}):
+
+        time_beg = datetime.now()
+        self._time_beg = time_beg
 
         if not isinstance(sets, self._CLASS_SETTINGS):
             sets = self._CLASS_SETTINGS(**sets)
@@ -52,9 +56,6 @@ class Core(utils.Singleton):
             warnings.simplefilter("error")
             warnings.filterwarnings("ignore", message="numpy.dtype size changed")
             warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
-        else:
-            self.log.info("Adding traceback to warnings")
-            warnings.showwarning = warn_with_traceback
         '''
         self.log.debug("Adding traceback to warnings")
         warnings.showwarning = warn_with_traceback
