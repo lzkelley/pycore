@@ -41,6 +41,23 @@ class Core(utils.Singleton):
 
         self.paths = paths
 
+        # Set MPI based variables
+        # --------------------------------------
+        try:
+            comm = MPI.COMM_WORLD  # noqa
+            rank = comm.rank
+            parallel = True
+        except:
+            rank = 0
+            parallel = False
+
+        self._mpi_rank = rank
+        self._mpi_is_root = (rank == 0)
+        self._mpi_parallel = parallel
+
+        # Setup Logger
+        # ---------------------------------------
+        
         # TODO: `log` argument is not being used!
         log = logger.get_logger(self)
         self.log = log
@@ -63,18 +80,6 @@ class Core(utils.Singleton):
         # Setup Environment related parameters depdending on run-type
         # --------------------------------------------------------------------
         self._setup_py_env()
-
-        try:
-            comm = MPI.COMM_WORLD  # noqa
-            rank = comm.rank
-            parallel = True
-        except:
-            rank = 0
-            parallel = False
-
-        self._mpi_rank = rank
-        self._mpi_is_root = (rank == 0)
-        self._mpi_parallel = parallel
 
         import sys
 
