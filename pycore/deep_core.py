@@ -8,7 +8,7 @@ import sys
 
 import tqdm
 
-import cosmopy
+# import cosmopy
 
 from . import utils, paths, logger, settings
 
@@ -44,26 +44,36 @@ class Core(utils.Singleton):
         # Set MPI based variables
         # --------------------------------------
         try:
+            if sets._pyenv.startswith('notebook'):
+                warnings.warn("Skipping MPI setup for notebook environment!")
+                raise
+
+            from mpi4py import MPI
             comm = MPI.COMM_WORLD  # noqa
             rank = comm.rank
-            parallel = True
+            size = comm.size
+            parallel = (size > 1)
         except:
             rank = 0
+            size = 1
             parallel = False
 
         self._mpi_rank = rank
+        self._mpi_size = size
         self._mpi_is_root = (rank == 0)
-        self._mpi_parallel = parallel
+        self._mpi_is_parallel = parallel
 
         # Setup Logger
         # ---------------------------------------
-        
+
         # TODO: `log` argument is not being used!
         log = logger.get_logger(self)
         self.log = log
+        print("Log filename: '{}'".format(log.filename))
 
         self.log.debug("Core initializing... loaded: `sets`, `paths`, `log`")
-        self.cosmo = cosmopy.get_cosmology()
+        # self.cosmo = cosmopy.get_cosmology()
+        self.cosmo = self._load_cosmology()
         self.log.debug("Loaded `cosmo`")
 
         '''
@@ -90,11 +100,17 @@ class Core(utils.Singleton):
 
         return
 
+    def _load_cosmology(self):
+        import cosmopy
+        cosmo = cosmopy.get_cosmology()
+        return cosmo
+
     @classmethod
-    def load(self, core=None):
+    def load(cls, core=None):
         if core is None:
             core = Core()
 
+        # if not issubclass(core, cls):
         if not isinstance(core, Core):
             raise ValueError("`core` type: {} is invalid!".format(type(core)))
 
@@ -128,7 +144,11 @@ class Core(utils.Singleton):
 
         # Set progress-bar type based on environment
         #    `_is_notebook` is set in `_setup_py_env()`
-        tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
+        if self._mpi_is_root:
+            tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
+        else:
+            tqdm_method = lambda xx, *args, **kwargs: xx
+
         self.tqdm = tqdm_method
 
         return
