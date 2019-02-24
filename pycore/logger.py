@@ -51,13 +51,13 @@ def get_logger(core):
         fname_base = fname
         fname_suff = ".log"
     else:
-        fname_base = comps[:-1]
-        fname_suff = comps[-1]
+        fname_base = ".".join(comps[:-1])
+        fname_suff = "." + comps[-1]
 
     rank = core._mpi_rank
     tostr = (rank == 0)
     if rank > 0:
-        fname_suff = "_rank{:04d}".format(rank) + fname_suff
+        fname_suff = "_rank-{:04d}".format(rank) + fname_suff
 
     fname = fname_base + fname_suff
     fname = os.path.join(paths.output_logs, fname)
