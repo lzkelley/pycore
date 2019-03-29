@@ -19,7 +19,6 @@ class Paths(utils.Singleton):
     _CHECK_PATHS = []
     _CWD = os.path.realpath(os.getcwd())
 
-
     def __init__(self, core, **kwargs):
         self._core = core
         self._node_name = os.uname().nodename
