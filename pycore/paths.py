@@ -10,7 +10,8 @@ import zcode.inout as zio
 from . import utils
 
 
-class Paths(utils.Singleton):
+# class Paths(utils.Singleton):
+class Paths:
 
     # MODULE = PATH_MODULE
     # _DNAME_PLOTS = "figs"
@@ -18,7 +19,6 @@ class Paths(utils.Singleton):
     # Paths to create if they do not already exist
     _CHECK_PATHS = []
     _CWD = os.path.realpath(os.getcwd())
-
 
     def __init__(self, core, **kwargs):
         self._core = core
@@ -120,6 +120,8 @@ class Paths(utils.Singleton):
         modify_exists = False
         path = self.output_figs
         if subdir is not None:
+            if subdir is True:
+                subdir = name.split('.')[0]
             path = os.path.join(path, subdir)
             modify_exists = True
 
@@ -164,6 +166,10 @@ class Paths(utils.Singleton):
     def output_logs(self):
         # return self.output
         return self._CWD
+
+
+class Paths_Single(Paths, utils.Singleton):
+    pass
 
 
 def modify_filename(fname, prepend='', append=''):

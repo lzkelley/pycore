@@ -20,7 +20,8 @@ def warn_with_traceback(message, category, filename, lineno, file=None, line=Non
     return
 
 
-class Core(utils.Singleton):
+# class Core(utils.Singleton):
+class Core:
 
     _CLASS_SETTINGS = settings.Settings
     _CLASS_PATHS = paths.Paths
@@ -67,7 +68,9 @@ class Core(utils.Singleton):
         # ---------------------------------------
 
         # TODO: `log` argument is not being used!
-        log = logger.get_logger(self)
+        if isinstance(log, dict):
+            log = logger.get_logger(self, **log)
+            
         self.log = log
         print("Log filename: '{}'".format(log.filename))
 
@@ -97,6 +100,9 @@ class Core(utils.Singleton):
             self.log.exception("An unhandled exception occurred.", exc_info=(exctype, exc, tb))
 
         sys.excepthook = _excepthook
+
+        # Any final operations
+        self.finalize()
 
         return
 
@@ -164,6 +170,9 @@ class Core(utils.Singleton):
     def setup_for_script(self):
         pass
 
+    def finalize(self, *args, **kwargs):
+        pass
+
     '''
     def save_fig(self, fig, fname, modify_exists=True, save_kwargs={},
                  close=None, show=None, subdir=None, append=None, prepend=None, recent_copy=True):
@@ -192,3 +201,7 @@ class Core(utils.Singleton):
     def root(self):
         return self.__root
     '''
+
+
+class Core_Single(Core, utils.Singleton):
+    pass

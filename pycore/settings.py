@@ -10,7 +10,8 @@ import numpy as np
 from . import utils
 
 
-class Settings(utils.Singleton):
+# class Settings(utils.Singleton):
+class Settings:
 
     NAME = ""
     VERBOSITY = 20     # 30: warning, 20: info, 10:debug
@@ -184,6 +185,10 @@ class Settings(utils.Singleton):
 
         print("Parameters saved to '{}'".format(fname))
         return
+
+
+class Settings_Single(Settings, utils.Singleton):
+    pass
 
 
 @utils.Singleton
