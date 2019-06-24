@@ -74,9 +74,12 @@ class Settings:
             parse_cl = _is_script
 
         if parse_cl:
-            # print("pycore.settings.py:parse_args()")
-            # print("pycore.settings.py:sys.argv = ", sys.argv)
             self.parse_args()
+
+        if self.LOG_FILENAME is None:
+            fname = "log-{}".format(self._pyenv)
+            fname += self.NAME + ".log"
+            self.LOG_FILENAME = fname
 
         return
 
