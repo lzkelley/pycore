@@ -3,6 +3,7 @@
 
 import os
 # from datetime import datetime
+import datetime
 import logging
 import inspect
 
@@ -23,10 +24,10 @@ class IndentFormatter(logging.Formatter):
             return super().format(rec)
             # Replace record.msg with the string representation of the message
             # use repr() to prevent printing it to multiple lines
-            rec.indent = ""
-            rec.msg = repr(super().formatException(rec.exc_info))
-            rec.exc_info = None
-            return super().format(rec)
+            # rec.indent = ""
+            # rec.msg = repr(super().formatException(rec.exc_info))
+            # rec.exc_info = None
+            # return super().format(rec)
 
         stack = inspect.stack()
         if (self.baseline is None) or (len(stack) < self.baseline):
@@ -37,6 +38,54 @@ class IndentFormatter(logging.Formatter):
         out = logging.Formatter.format(self, rec)
         del rec.indent
         return out
+
+
+class LogTimer:
+
+    def __init__(self, log=None, lvl=logging.DEBUG):
+        if log is None:
+            log = logging.getLogger()
+        self._log = log
+        self._beg = None
+        self._lvl = lvl
+        self.name = None
+        return
+
+    def __call__(self, name=None, lvl=None):
+        self.name = name
+        if lvl is not None:
+            self._lvl = lvl
+        return self
+
+    def __enter__(self):
+        self._beg = datetime.datetime.now()
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        if exc_type is not None:
+            return
+
+        end = datetime.datetime.now()
+        beg = self._beg
+
+        msg = 'done after '
+        if self.name is not None:
+            msg = "'{}' {}".format(self.name, msg)
+
+        self.log(beg, end, msg=msg)
+        self.name = None
+        return
+
+    def log(self, beg, end, msg="", lvl=None):
+        if lvl is None:
+            lvl = self._lvl
+
+        dur = end - beg
+        dur_sec = dur.total_seconds()
+        out = "{msg:}{dur_sec:.3e} - {dur:} : {beg:} => {end:}".format(
+            msg=msg, dur_sec=dur_sec, dur=dur, beg=beg, end=end)
+        self._log.log(lvl, out)
+        return
 
 
 def get_logger(core):
@@ -229,6 +278,9 @@ def load_logger(name, format_stream=None, format_file=None, format_date=None,
 
     for lvl in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
         setattr(logger, lvl, getattr(logging, lvl))
+
+    timer = LogTimer(logger)
+    logger.timer = timer
 
     return logger
 
