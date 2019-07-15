@@ -58,7 +58,12 @@ class Paths:
 
         # Make sure required directories exist
         for path in self._CHECK_PATHS:
-            zio.check_path(path)
+            try:
+                zio.check_path(path)
+            except:
+                print("\nFAILED on '{}'".format(path))
+                print("check paths: '{}'".format(self._CHECK_PATHS))
+                raise
 
         self._req_files = req_files
         # Make sure required files exist
@@ -105,7 +110,7 @@ class Paths:
 
         return path
 
-    def save_fig(self, fig, name, subdir=None, fignum=None, close=None, log_lvl=30):
+    def save_fig(self, fig, name, subdir=None, fignum=None, close=None, log_lvl=30, **kwargs):
         if (not name.endswith('.pdf')) and (not name.endswith('.png')):
             name += '.pdf'
 
@@ -130,7 +135,7 @@ class Paths:
         if modify_exists:
             fname = zio.modify_exists(fname)
 
-        fig.savefig(fname)
+        fig.savefig(fname, **kwargs)
         self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
         if fignum is not None:
@@ -140,7 +145,7 @@ class Paths:
                 name = zio.modify_filename(name, prepend=fignum + "_")
             fname = os.path.join(self.path_output_figs, name)
             zio.check_path(fname)
-            fig.savefig(fname)
+            fig.savefig(fname, **kwargs)
             # if verbose:
             self._core.log.log(log_lvl, "Saved to '{}'".format(fname))
 
