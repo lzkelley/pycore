@@ -7,6 +7,7 @@ import warnings
 import sys
 
 import tqdm
+import tqdm.notebook
 
 # import cosmopy
 
@@ -70,7 +71,7 @@ class Core:
         # TODO: `log` argument is not being used!
         if isinstance(log, dict):
             log = logger.get_logger(self, **log)
-            
+
         self.log = log
         print("Log filename: '{}'".format(log.filename))
 
@@ -151,7 +152,7 @@ class Core:
         # Set progress-bar type based on environment
         #    `_is_notebook` is set in `_setup_py_env()`
         if self._mpi_is_root:
-            tqdm_method = tqdm.tqdm_notebook if self._is_notebook else tqdm.tqdm
+            tqdm_method = tqdm.notebook.tqdm if self._is_notebook else tqdm.tqdm
         else:
             tqdm_method = lambda xx, *args, **kwargs: xx
 
